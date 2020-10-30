@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Reading List Interface - Worksheet 2</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        td#bookData {
+            width: 30vw;
+        }
+
+        td#list {
+            width: 70vw;
+            vertical-align: top;
+        }
+
+        input#bookTitle,
+        input#bookGenre,
+        input#bookAuthor,
+        input#bookDate {
+            width: 25vw;
+        }
+
+        input#bookDate {
+            line-height: 1.9rem;
+        }
+
+        table#booklistTable tbody tr:nth-child(odd){
+            background-color: lightgray;
+        }
+    </style>
+    <script src="TheReadingList.js"></script>
+</head>
+
+<body>
+
+    <h1>Your book list</h1>
+
+    <table>
+        <tr>
+            <td id="bookData">
+                
+                    <fieldset>
+                        <legend>Book data:</legend>
+                        <p>
+                            <label for="bookTitle">Title: </label><br />
+                            <input type="text" name="bookTitle" id="bookTitle" />
+                        </p>
+                        <p>
+                            <label for="bookGenre">Genre: </label><br />
+                            <input type="text" name="bookGenre" id="bookGenre" />
+                        </p>
+                        <p>
+                            <label for="bookAuthor">Author: </label><br />
+                            <input type="text" name="bookAuthor" id="bookAuthor" />
+                        </p>
+                        <p>
+                            <input type="checkbox" name="bookReaded" id="bookReaded">
+                            <label for="bookReaded">Have you read this book?</label>
+                        </p>
+                        <p>
+                            <label for="bookDate">If so, when: </label><br />
+                            <input type="date" name="bookDate" id="bookDate" disabled>
+                        </p>
+                        <button id="addBookButton">Add book</button>
+                    </fieldset>
+                
+            </td>
+            <td id="list">
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>
