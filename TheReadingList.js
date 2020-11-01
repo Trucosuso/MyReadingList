@@ -1,4 +1,3 @@
-//@ts-check
 /** Class representing a book */
 class Book {
     /**
@@ -78,6 +77,15 @@ class Booklist {
         return this.booklist.filter(book => !book.read).length;
     }
 
+    /**
+     * Total of books in the booklist
+     * @public
+     * @returns {Number}
+     */
+    get totalBooks() {
+        return this.booklist.length;
+    }
+
     // Methods
 
     /**
@@ -106,19 +114,18 @@ class Booklist {
 window.addEventListener("load", main);
 var booklist = new Booklist();
 
+/**
+ * Starts the script
+ */
 function main() {
-    let libro1 = new Book("Fundación", "Ciencia Ficción", "Isaac Asimov", true, new Date(Date.now()));
-    let libro2 = new Book("Hyperion", "Ciencia Ficción", "Dan Simmons");
-    let libro3 = new Book("Ensayo sobre la ceguera", "Novela", "José Saramago");
-    let libro4 = new Book("El señor de los anillos", "Fantasía", "J. R. R. Tolkien");
-    booklist.add(libro1, libro2, libro3, libro4);
     pintarTabla(document.getElementById("list"), booklist);
     document.getElementById("addBookButton").addEventListener("click", añadirLibro);
     document.getElementById("bookReaded").addEventListener("click", activarFecha);
+    document.getElementById("finishCurrentBookButton").addEventListener("click", finishCurrentBook);
 }
 
 /**
- * 
+ * Enables the date input if the book being added has been read and disables it if the book has not been read
  * @param {MouseEvent} e 
  */
 function activarFecha(e) {
@@ -130,50 +137,90 @@ function activarFecha(e) {
 }
 
 /**
- * Draws a table inside element and fill it with books from booklist
+ * Draws a table inside element and fill it with books from booklist.
+ * Writes the current book being read and updates the readed book counter
  * @param {HTMLElement} element
  * @param {Booklist} booklist 
  */
 function pintarTabla(element, booklist) {
     let table = "";
-    table += "<table style=\"width: 100%;\" id=\"booklistTable\"><caption>Booklist</caption>";
+    table += "<table class=\"table table-sm table-striped\" id=\"booklistTable\">";
     table += "<thead><th>Title</th><th>Genre</th><th>Author</th><th>Has been read?</th><th>Read date</th></thead>";
-    booklist.booklist.forEach(book => {
-        table += "<tr>";
-        for (const key in book) {
-            if (book[key] === false) {
-                table += "<td>No</td>";
-            } else if (book[key] === true) {
-                table += "<td>Sí</td>";
-            } else if (book[key] === null) {
-                table += "<td>-</td>";
-            } else if (book[key] instanceof Date) {
-                /* HAY MÉTODOS QUE MAQUETAN FECHAS */
-                table += "<td>" + book[key].getDate() + "/" + book[key].getMonth() + "/" + book[key].getFullYear() + "</td>";
-            } else {
-                table += "<td>" + book[key] + "</td>";
-            }
+    table += "<tbody>";
+
+
+    booklist.booklist.forEach( /** @param {Book} book */ book => {
+
+        // If the book being added to the table is the current book, color its row
+        if (book === booklist.currentBook) {
+            table += "<tr class=\"table-primary\">";
+        } else {
+            table += "<tr>";
         }
+
+        // If the book has been readed set readed to Sí to show it in the table
+        let readed = "No";
+        if (book.read) {
+            readed = "Sí";
+        }
+
+        // If the book has a valid date print day/month/year
+        let date = "-";
+        if (book.readDate instanceof Date && !isNaN(book.readDate.getDate())) {
+            const options = { year: "numeric", month: "numeric", day: "numeric" };
+            date = book.readDate.toLocaleDateString("es-ES", options);
+        }
+
+        // Print book into 
+        table += "<td>" + book.title + "</td>" + "<td>" + book.genre + "</td>" + "<td>" + book.author + "</td>" + "<td>" + readed + "</td>" + "<td>" + date + "</td>";
+
         table += "</tr>";
     });
+    table += "</tbody>";
     element.innerHTML = table;
+
+    // Update current book if exists else say there is no book
+    if (booklist.currentBook != null) {
+        let currentBook = `You are now reading ${booklist.currentBook.title} by ${booklist.currentBook.author}.`;
+        document.getElementById("currentBook").innerHTML = currentBook;
+    } else {
+        let currentBook = "You are not reading anything right now.";
+        document.getElementById("currentBook").innerHTML = currentBook;
+    }
+
+
+    // Update readed books counter
+    let readedBooksCounter = `You have read ${booklist.readedBooks} out of ${booklist.totalBooks} books.`;
+    document.getElementById("numberOfReadedBooks").innerHTML = readedBooksCounter;
 }
 
+/**
+ * Adds a book from the form to the booklist
+ */
 function añadirLibro() {
     let title = document.getElementById("bookTitle").value;
-    let genre = document.getElementById("bookGenre").value;
-    let author = document.getElementById("bookAuthor").value;
-    let read = document.getElementById("bookReaded").checked;
-    let readDate = document.getElementById("bookDate").value;
-    if (read) {
-        booklist.add(new Book(title, genre, author, read, new Date(readDate)));
+    // Do not add the book the title is empty
+    if (title == "") {
+        document.getElementById("bookTitle").style.borderColor = "red";
     } else {
-        booklist.add(new Book(title, genre, author));
+        document.getElementById("bookTitle").style.borderColor = "#ced4da";
+        let genre = document.getElementById("bookGenre").value;
+        let author = document.getElementById("bookAuthor").value;
+        let read = document.getElementById("bookReaded").checked;
+        let readDate = document.getElementById("bookDate").value;
+        if (read) {
+            booklist.add(new Book(title, genre, author, read, new Date(readDate)));
+        } else {
+            booklist.add(new Book(title, genre, author));
+        }
+        limpiarInputs();
+        pintarTabla(document.getElementById("list"), booklist);
     }
-    limpiarInputs();
-    pintarTabla(document.getElementById("list"), booklist);
 }
 
+/**
+ * Cleans the form
+ */
 function limpiarInputs() {
     document.getElementById("bookTitle").value = "";
     document.getElementById("bookGenre").value = "";
@@ -182,4 +229,12 @@ function limpiarInputs() {
     document.getElementById("bookReaded").checked = false;
     document.getElementById("bookDate").value = "";
     document.getElementById("bookDate").disabled = true;
+}
+
+/**
+ * Finish current book and redraws the table
+ */
+function finishCurrentBook() {
+    booklist.finishCurrentBook();
+    pintarTabla(document.getElementById("list"), booklist);
 }
