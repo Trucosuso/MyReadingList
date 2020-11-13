@@ -123,9 +123,27 @@ class Booklist {
         }
         return null;
     }
+
+    /**
+     * Deletes the book that has that title, that genre and that author. Returns true if it can detele, false if it does not
+     * @param {String} bookTitle Title of book to delete
+     * @param {String} bookGenre Genre of book to delete
+     * @param {String} bookAuthor Author of book to delete
+     * @returns {Boolean} True if is able to delete the book, false if it does not
+     */
+    removeBook(bookTitle, bookGenre, bookAuthor) {
+        let bookToDelete = this.booklist.findIndex(book => book.title == bookTitle && book.genre == bookGenre && book.author == bookAuthor);
+        if (bookToDelete == -1) {
+            return false;
+        } else {
+            this.booklist.splice(bookToDelete, 1);
+            return true;
+        }
+    }
 }
 
 var booklist = new Booklist();
+booklist.add(new Book("Fundación", "Ciencia Ficción", "Isaac Asimov"));
 window.addEventListener("load", main);
 
 /**
@@ -163,7 +181,7 @@ function pintarTabla(element, booklist) {
 
     // Create thead
     let thead = document.createElement("thead");
-    let textForHeaders = ["Title", "Genre", "Author", "Has been read?", "Read date"];
+    let textForHeaders = ["Title", "Genre", "Author", "Has been read?", "Read date", "Actions"];
     for (const headerText of textForHeaders) {
         let th = document.createElement("th");
         let text = document.createTextNode(headerText);
@@ -217,13 +235,25 @@ function libroATabla(tabla, book) {
     }
     bookData.push(date);
 
-    // Add book data to table row and tr to table body
+    // Add book data to table row
     for (const data of bookData) {
         let td = document.createElement("td");
         let text = document.createTextNode(data);
         td.appendChild(text);
         tr.appendChild(td);
     }
+
+    // Add delete icon to a td and a tr
+    let td = document.createElement("td");
+    let deleteIcon = document.createElement("span");
+    deleteIcon.classList.add("material-icons");
+    deleteIcon.textContent = "delete";
+    deleteIcon.style.cursor = "pointer";
+    deleteIcon.addEventListener("click", deleteBook);
+    td.append(deleteIcon);
+    tr.append(td);
+
+    // Add row to table
     tabla.appendChild(tr);
 
     // Update text below the table
@@ -301,6 +331,31 @@ function finishCurrentBook() {
         // Update text below the table
         updateCurrentAndReadedBookText();
     }
+}
+
+/**
+ * Deletes a book from table and from booklist
+ * @param {MouseEvent} e 
+ */
+function deleteBook(e) {
+    // Row to delete
+    let tableROw = e.target.parentElement.parentElement;
+
+    // Book data
+    let title = tableROw.childNodes[0].firstChild.nodeValue;
+    let genre = tableROw.childNodes[1].firstChild.nodeValue;
+    let author = tableROw.childNodes[2].firstChild.nodeValue;
+
+    // Delete book from booklist and from row.
+    booklist.removeBook(title, genre, author);
+    tableROw.remove();
+
+    // Color row containing current book if there is one
+    if (booklist.currentBook) {
+        document.getElementById("booklistTableBody").childNodes[booklist.currentBookIndex].classList.add("table-primary");
+    }
+
+    updateCurrentAndReadedBookText();
 }
 
 /**
