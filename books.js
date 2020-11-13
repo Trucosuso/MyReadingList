@@ -7,13 +7,15 @@ class Book {
      * @param {String} author 
      * @param {Boolean} read False by default
      * @param {Date} readDate Null by default
+     * @param {Number} id BookID
      */
-    constructor(title, genre, author, read = false, readDate = null) {
+    constructor(title, genre, author, read = false, readDate = null, id = null) {
         this.title = title;
         this.genre = genre;
         this.author = author;
         this.read = read;
         this.readDate = readDate;
+        this.id = id;
     }
 }
 
@@ -27,6 +29,7 @@ class Booklist {
     constructor(booklist = [], lastBook = null) {
         this.booklist = booklist;
         this.lastBook = lastBook;
+        this.bookID = 0;
     }
 
     // GETTERS
@@ -104,10 +107,13 @@ class Booklist {
 
     /**
      * Adds books to the list
-     * @param {...Book} book 
+     * @param {...Book} books 
      */
-    add(...book) {
-        this.booklist.push(...book);
+    add(...books) {
+        for (const book of books) {
+            book.id = this.bookID++;
+        }
+        this.booklist.push(...books);
     }
 
     /**
