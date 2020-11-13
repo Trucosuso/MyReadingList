@@ -146,6 +146,16 @@ class Booklist {
             return true;
         }
     }
+
+    removeBookByID(id){
+        let bookToDelete = this.booklist.findIndex(book => book.id == id);
+        if (bookToDelete == -1) {
+            return false;
+        } else {
+            this.booklist.splice(bookToDelete, 1);
+            return true;
+        }
+    }
 }
 
 export {Book, Booklist};
