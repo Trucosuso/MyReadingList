@@ -143,7 +143,6 @@ class Booklist {
 }
 
 var booklist = new Booklist();
-booklist.add(new Book("Fundación", "Ciencia Ficción", "Isaac Asimov"));
 window.addEventListener("load", main);
 
 /**
