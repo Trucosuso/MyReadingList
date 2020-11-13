@@ -70,6 +70,7 @@ function pintarTabla(element, booklist) {
  */
 function libroATabla(tabla, book) {
     let tr = document.createElement("tr");
+    tr.bookID = book.id;
     if (book === booklist.currentBook) {
         tr.classList.add("table-primary");
     }
@@ -196,16 +197,14 @@ function finishCurrentBook() {
  */
 function deleteBook(e) {
     // Row to delete
-    let tableROw = e.target.parentElement.parentElement;
+    let tableRow = e.target.parentElement.parentElement;
 
-    // Book data
-    let title = tableROw.childNodes[0].firstChild.nodeValue;
-    let genre = tableROw.childNodes[1].firstChild.nodeValue;
-    let author = tableROw.childNodes[2].firstChild.nodeValue;
+    // Book id
+    let id = tableRow.bookID;
 
     // Delete book from booklist and from row.
-    booklist.removeBook(title, genre, author);
-    tableROw.remove();
+    console.log(booklist.removeBookByID(id));
+    tableRow.remove();
 
     // Color row containing current book if there is one
     if (booklist.currentBook) {
